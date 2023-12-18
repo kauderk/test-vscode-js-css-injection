@@ -69,13 +69,17 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/node-fetch": "^2.6.9",
+    "@types/uuid": "^9.0.7",
     "eslint": "^8.21.0",
-    "eslint-config-prettier": "^8.5.0"
+    "eslint-config-prettier": "^8.5.0",
+    "node-fetch": "^2.7.0"
   },
   "dependencies": {
     "file-url": "^3.0.0",
-    "node-fetch": "^2.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "vscode": "^1.1.37"
   },
   "extensionKind": [
     "ui"

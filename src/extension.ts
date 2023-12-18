@@ -1,12 +1,16 @@
-const vscode = require('vscode')
-const fs = require('fs')
-const path = require('path')
-const msg = require('./messages').messages
-const uuid = require('uuid')
-const fetch = require('node-fetch')
-const Url = require('url')
+import vscode from 'vscode'
+import fs from 'fs'
+import path from 'path'
+import msg from './messages'
+import uuid from 'uuid'
+import fetch from 'node-fetch'
+import Url from 'url'
 
-function activate(context) {
+function activate(context: vscode.ExtensionContext) {
+  if (!require.main?.filename) {
+    vscode.window.showErrorMessage(msg.internalError + 'no main filename')
+    return
+  }
   const appDir = path.dirname(require.main.filename)
   const base = path.join(appDir, 'vs', 'code')
   const htmlFile = path.join(
@@ -15,7 +19,7 @@ function activate(context) {
     'workbench',
     'workbench.html'
   )
-  const BackupFilePath = (uuid) =>
+  const BackupFilePath = (uuid: string) =>
     path.join(
       base,
       'electron-sandbox',
@@ -23,7 +27,7 @@ function activate(context) {
       `workbench.${uuid}.bak-custom-css`
     )
 
-  async function getContent(url) {
+  async function getContent(url: string) {
     if (/^file:/.test(url)) {
       const fp = Url.fileURLToPath(url)
       return await fs.promises.readFile(fp)
@@ -61,7 +65,7 @@ function activate(context) {
 
   // #### Backup ################################################################
 
-  async function getBackupUuid(htmlFilePath) {
+  async function getBackupUuid(htmlFilePath: string) {
     try {
       const htmlContent = await fs.promises.readFile(htmlFilePath, 'utf-8')
       const m = htmlContent.match(
@@ -75,7 +79,7 @@ function activate(context) {
     }
   }
 
-  async function createBackup(uuidSession) {
+  async function createBackup(uuidSession: string) {
     try {
       let html = await fs.promises.readFile(htmlFile, 'utf-8')
       html = clearExistingPatches(html)
@@ -86,7 +90,7 @@ function activate(context) {
     }
   }
 
-  async function restoreBackup(backupFilePath) {
+  async function restoreBackup(backupFilePath: string) {
     try {
       if (fs.existsSync(backupFilePath)) {
         await fs.promises.unlink(htmlFile)
@@ -110,7 +114,7 @@ function activate(context) {
 
   // #### Patching ##############################################################
 
-  async function performPatch(uuidSession) {
+  async function performPatch(uuidSession: string) {
     const config = vscode.workspace.getConfiguration('vscode_custom_css')
     if (!patchIsProperlyConfigured(config)) {
       return vscode.window.showInformationMessage(msg.notConfigured)
@@ -143,7 +147,7 @@ function activate(context) {
     }
     enabledRestart()
   }
-  function clearExistingPatches(html) {
+  function clearExistingPatches(html: string) {
     html = html.replace(
       /<!-- !! VSCODE-CUSTOM-CSS-START !! -->[\s\S]*?<!-- !! VSCODE-CUSTOM-CSS-END !! -->\n*/,
       ''
@@ -155,11 +159,12 @@ function activate(context) {
     return html
   }
 
-  function patchIsProperlyConfigured(config) {
+  type Config = vscode.WorkspaceConfiguration
+  function patchIsProperlyConfigured(config: Config) {
     return config && config.imports && config.imports instanceof Array
   }
 
-  async function patchHtml(config) {
+  async function patchHtml(config: Config) {
     let res = ''
     for (const item of config.imports) {
       const imp = await patchHtmlForItem(item)
@@ -167,7 +172,7 @@ function activate(context) {
     }
     return res
   }
-  async function patchHtmlForItem(url) {
+  async function patchHtmlForItem(url: string) {
     if (!url) return ''
     if (typeof url !== 'string') return ''
 

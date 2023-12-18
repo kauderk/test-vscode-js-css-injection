@@ -1,4 +1,4 @@
-exports.messages = {
+export default {
   admin: 'Run VS Code with admin privileges so the changes can be applied.',
   enabled:
     'Custom CSS and JS enabled. Restart to take effect. ' +
@@ -8,6 +8,7 @@ exports.messages = {
     'Custom CSS and JS disabled and reverted to default. Restart to take effect.',
   already_disabled: 'Custom CSS and JS already disabled.',
   somethingWrong: 'Something went wrong: ',
+  internalError: 'Internal error: ',
   restartIde: 'Restart Visual Studio Code',
   notfound: 'Custom CSS and JS not found.',
   notConfigured:
@@ -16,5 +17,5 @@ exports.messages = {
   reloadAfterVersionUpgrade:
     'Detected reloading CSS / JS after VSCode is upgraded. ' +
     'Performing application only.',
-  cannotLoad: (url) => `Cannot load '${url}'. Skipping.`,
+  cannotLoad: (url: string) => `Cannot load '${url}'. Skipping.`,
 }

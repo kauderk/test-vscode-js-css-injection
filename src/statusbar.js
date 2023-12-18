@@ -1,16 +1,6 @@
 /* eslint-env browser */
 ;(function () {
   function patch() {
-    try {
-      document.body.customVsCode = {
-        __CUSTOM_CSS_JS_INDICATOR: true,
-      }
-      window.customVsCode = {
-        __CUSTOM_CSS_JS_INDICATOR: true,
-      }
-    } catch (error) {
-      console.error(error)
-    }
     const e1 = document.querySelector('.right-items')
     const e2 = document.querySelector(
       '.right-items .__CUSTOM_CSS_JS_INDICATOR_CLS'
@@ -32,6 +22,14 @@
         e.appendChild(a)
       }
       e1.appendChild(e)
+
+      let on = true
+      e.onclick = () => {
+        if (on) {
+        } else {
+        }
+        on = !on
+      }
     }
   }
   setInterval(patch, 5000)
