@@ -60,7 +60,7 @@ async function installImpl() {
     let indicatorJsPath
     let ext = vscode.extensions.getExtension('be5invis.vscode-custom-css')
     if (ext && ext.extensionPath) {
-      indicatorJsPath = path.resolve(ext.extensionPath, 'src/statusbar.js')
+      indicatorJsPath = path.resolve(ext.extensionPath, 'dist/statusbar.js')
     } else {
       indicatorJsPath = path.resolve(__dirname, 'statusbar.js')
     }
