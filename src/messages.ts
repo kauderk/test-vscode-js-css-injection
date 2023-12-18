@@ -17,5 +17,5 @@ export default {
   reloadAfterVersionUpgrade:
     'Detected reloading CSS / JS after VSCode is upgraded. ' +
     'Performing application only.',
-  cannotLoad: (url: string) => `Cannot load '${url}'. Skipping.`,
-}
+  cannotLoad: (url: string) => `Cannot load '${url}'. Skipping.` as const,
+} as const

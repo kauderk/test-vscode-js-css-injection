@@ -32,7 +32,7 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./src/extension",
+  "main": "./dist/extension",
   "contributes": {
     "commands": [
       {
@@ -86,9 +86,9 @@
     "ui"
   ],
   "scripts": {
-    "build": "tsc src/extension.ts",
+    "build": "tsc",
     "vscode:prepublish": "npx -y rimraf node_modules && npm install --prod",
-    "vscode:uninstall": "node ./src/uninstall"
+    "vscode:uninstall": "node ./dist/uninstall"
   },
   "__metadata": {
     "id": "1b160753-ae5e-42bb-82ad-d115ce5c10f4",

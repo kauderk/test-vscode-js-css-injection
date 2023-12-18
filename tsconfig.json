@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,6 +15,6 @@
       "vscode": ["./node_modules/vscode"]
     }
   },
-  "include": ["src/**/*.ts", "src/uninstall.js"],
+  "include": ["src/**/*.ts", "src/uninstall.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

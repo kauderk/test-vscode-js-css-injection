@@ -15,5 +15,5 @@ exports.default = {
         'Please set "vscode_custom_css.imports" in your user settings.',
     reloadAfterVersionUpgrade: 'Detected reloading CSS / JS after VSCode is upgraded. ' +
         'Performing application only.',
-    cannotLoad: function (url) { return "Cannot load '".concat(url, "'. Skipping."); },
+    cannotLoad: (url) => `Cannot load '${url}'. Skipping.`,
 };
