@@ -4,6 +4,7 @@
   "description": "Custom CSS and JS for Visual Studio Code",
   "version": "7.2.1",
   "publisher": "be5invis",
+  "type": "module",
   "author": {
     "email": "belleve@typeof.net",
     "name": "Belleve Invis",
@@ -85,6 +86,7 @@
     "ui"
   ],
   "scripts": {
+    "build": "tsc src/extension.ts",
     "vscode:prepublish": "npx -y rimraf node_modules && npm install --prod"
   },
   "__metadata": {

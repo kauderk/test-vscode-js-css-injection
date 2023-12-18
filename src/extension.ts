@@ -1,10 +1,10 @@
-import vscode from 'vscode'
-import fs from 'fs'
-import path from 'path'
+import * as vscode from 'vscode'
+import * as fs from 'fs'
+import * as path from 'path'
 import msg from './messages'
-import uuid from 'uuid'
+import { v4 } from 'uuid'
 import fetch from 'node-fetch'
-import Url from 'url'
+import { URL, fileURLToPath } from 'url'
 
 function activate(context: vscode.ExtensionContext) {
   if (!require.main?.filename) {
@@ -29,7 +29,7 @@ function activate(context: vscode.ExtensionContext) {
 
   async function getContent(url: string) {
     if (/^file:/.test(url)) {
-      const fp = Url.fileURLToPath(url)
+      const fp = fileURLToPath(url)
       return await fs.promises.readFile(fp)
     } else {
       const response = await fetch(url)
@@ -40,7 +40,7 @@ function activate(context: vscode.ExtensionContext) {
   // ####  main commands ######################################################
 
   async function cmdInstall() {
-    const uuidSession = uuid.v4()
+    const uuidSession = v4()
     await createBackup(uuidSession)
     await performPatch(uuidSession)
   }
@@ -177,7 +177,7 @@ function activate(context: vscode.ExtensionContext) {
     if (typeof url !== 'string') return ''
 
     // Copy the resource to a staging directory inside the extension dir
-    let parsed = new Url.URL(url)
+    let parsed = new URL(url)
     const ext = path.extname(parsed.pathname)
 
     try {
