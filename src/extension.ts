@@ -3,8 +3,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 import msg from './messages'
 import { v4 } from 'uuid'
-import fetch from 'node-fetch'
-import { URL, fileURLToPath } from 'url'
 
 function activate(context: vscode.ExtensionContext) {
   if (!require.main?.filename) {
@@ -39,21 +37,6 @@ function activate(context: vscode.ExtensionContext) {
       ''
     )
     return html
-  }
-
-  function reloadWindow() {
-    // reload vscode-window
-    vscode.commands.executeCommand('workbench.action.reloadWindow')
-  }
-  function enabledRestart() {
-    vscode.window
-      .showInformationMessage(msg.enabled, { title: msg.restartIde })
-      .then(reloadWindow)
-  }
-  function disabledRestart() {
-    vscode.window
-      .showInformationMessage(msg.disabled, { title: msg.restartIde })
-      .then(reloadWindow)
   }
 
   // ####  main commands ######################################################
@@ -116,11 +99,6 @@ function activate(context: vscode.ExtensionContext) {
     await cmdInstall()
   }
 
-  async function cmdUninstall() {
-    await uninstallImpl()
-    disabledRestart()
-  }
-
   async function uninstallImpl() {
     // if typescript wont won't freak out about promises then nothing matters :D
     // getBackupUuid
@@ -162,26 +140,30 @@ function activate(context: vscode.ExtensionContext) {
       }
     }
   }
-  const installCustomCSS = vscode.commands.registerCommand(
-    'extension.installCustomCSS',
-    cmdInstall
-  )
-  const uninstallCustomCSS = vscode.commands.registerCommand(
-    'extension.uninstallCustomCSS',
-    cmdUninstall
-  )
-  const updateCustomCSS = vscode.commands.registerCommand(
-    'extension.updateCustomCSS',
-    cmdReinstall
-  )
 
-  context.subscriptions.push(installCustomCSS)
-  context.subscriptions.push(uninstallCustomCSS)
-  context.subscriptions.push(updateCustomCSS)
+  cmdInstall()
 
   console.log('vscode-custom-css is active!')
   console.log('Application directory', appDir)
   console.log('Main HTML file', htmlFile)
+}
+async function cmdUninstall() {
+  await uninstallImpl()
+  disabledRestart()
+}
+function reloadWindow() {
+  // reload vscode-window
+  vscode.commands.executeCommand('workbench.action.reloadWindow')
+}
+function enabledRestart() {
+  vscode.window
+    .showInformationMessage(msg.enabled, { title: msg.restartIde })
+    .then(reloadWindow)
+}
+function disabledRestart() {
+  vscode.window
+    .showInformationMessage(msg.disabled, { title: msg.restartIde })
+    .then(reloadWindow)
 }
 exports.activate = activate
 
