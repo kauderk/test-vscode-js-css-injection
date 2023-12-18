@@ -29,6 +29,14 @@ function getWorkBenchHtmlData() {
 async function installImpl() {
   const file = getWorkBenchHtmlData()
 
+  const backupUuid = await getBackupUuid(file.path).catch((e) =>
+    console.error(e)
+  )
+  if (backupUuid) {
+    console.log('vscode-custom-css is active!')
+    return
+  }
+
   const uuidSession = v4()
   // await createBackup(uuidSession)
   {
@@ -98,22 +106,23 @@ function clearExistingPatches(html: string) {
     )
     .replace(/<!-- !! VSCODE-CUSTOM-CSS-SESSION-ID [\w-]+ !! -->\n*/g, '')
 }
-async function uninstallImpl() {
+async function getBackupUuid(path: string) {
+  try {
+    const uid = (await fs.promises.readFile(path, 'utf-8')) //
+      .match(/<!-- !! VSCODE-CUSTOM-CSS-SESSION-ID ([0-9a-fA-F-]+) !! -->/)
+    if (!uid) throw new Error('no backup uuid found')
+    else return uid[1]
+  } catch (e) {
+    vscode.window.showInformationMessage(msg.somethingWrong + e)
+    throw e
+  }
+}
+export async function uninstallImpl() {
   const file = getWorkBenchHtmlData()
 
   // if typescript wont won't freak out about promises then nothing matters :D
   // getBackupUuid
-  const backupUuid = await (async function getBackupUuid() {
-    try {
-      const uid = (await fs.promises.readFile(file.path, 'utf-8')) //
-        .match(/<!-- !! VSCODE-CUSTOM-CSS-SESSION-ID ([0-9a-fA-F-]+) !! -->/)
-      if (!uid) throw new Error('no backup uuid found')
-      else return uid[1]
-    } catch (e) {
-      vscode.window.showInformationMessage(msg.somethingWrong + e)
-      throw e
-    }
-  })()
+  const backupUuid = await getBackupUuid(file.path)
 
   // restoreBackup
   const backupFilePath = file.getBackupPath(backupUuid)
@@ -158,9 +167,9 @@ function _catch(e: unknown) {
   console.error(e)
 }
 // how do you make javascript freak out about promises/errors?
-export function deactivate() {
-  return uninstallImpl().catch(_catch)
-}
+// export function deactivate() {
+//   return uninstallImpl().catch(_catch)
+// }
 export function activate(context: vscode.ExtensionContext) {
   return installImpl().catch(_catch)
 }

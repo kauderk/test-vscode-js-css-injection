@@ -34,10 +34,10 @@
 				.view-lines {
 					--r: transparent;
 				}
-				.view-lines:has(.mtk4:hover) {
+				.view-lines:has(.mtk14:hover) {
 					--r: red;
 				}
-				.mtk4 {
+				.mtk14 {
 					color: var(--r);
 				}
 				`
