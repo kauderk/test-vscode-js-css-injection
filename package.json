@@ -4,7 +4,7 @@
   "description": "Custom CSS and JS for Visual Studio Code",
   "version": "7.2.1",
   "publisher": "be5invis",
-  "type": "module",
+  "type": "commonjs",
   "author": {
     "email": "belleve@typeof.net",
     "name": "Belleve Invis",

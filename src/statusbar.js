@@ -25,9 +25,24 @@
 
       let on = true
       e.onclick = () => {
-        if (on) {
-        } else {
-        }
+        const id = 'vscode-custom-css'
+        const styles =
+          document.getElementById(id) ?? document.createElement('style')
+        styles.id = id
+        styles.innerHTML = on
+          ? `
+				.view-lines {
+					--r: transparent;
+				}
+				.view-lines:has(.mtk4:hover) {
+					--r: red;
+				}
+				.mtk4 {
+					color: var(--r);
+				}
+				`
+          : ''
+        document.body.appendChild(styles)
         on = !on
       }
     }
