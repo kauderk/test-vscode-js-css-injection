@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.activate = exports.uninstallImpl = void 0;
+exports.activate = exports.uninstall = void 0;
 const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -45,7 +45,7 @@ function getWorkBenchHtmlData() {
 }
 async function installImpl() {
     const file = getWorkBenchHtmlData();
-    const backupUuid = await getBackupUuid(file.path).catch((e) => console.error(e));
+    const backupUuid = await getBackupUuid(file.path);
     if (backupUuid) {
         console.log('vscode-custom-css is active!');
         return;
@@ -91,6 +91,7 @@ async function installImpl() {
         catch (e) {
             vscode.window.showInformationMessage(messages_1.default.admin);
             disabledRestart();
+            return;
         }
         // enabledRestart()
         vscode.window
@@ -109,7 +110,7 @@ async function getBackupUuid(path) {
         const uid = (await fs.promises.readFile(path, 'utf-8')) //
             .match(/<!-- !! VSCODE-CUSTOM-CSS-SESSION-ID ([0-9a-fA-F-]+) !! -->/);
         if (!uid)
-            throw new Error('no backup uuid found');
+            return null;
         else
             return uid[1];
     }
@@ -118,11 +119,19 @@ async function getBackupUuid(path) {
         throw e;
     }
 }
+async function uninstall() {
+    return uninstallImpl().then(disabledRestart).catch(_catch);
+}
+exports.uninstall = uninstall;
 async function uninstallImpl() {
     const file = getWorkBenchHtmlData();
     // if typescript wont won't freak out about promises then nothing matters :D
     // getBackupUuid
     const backupUuid = await getBackupUuid(file.path);
+    if (!backupUuid) {
+        vscode.window.showInformationMessage(messages_1.default.somethingWrong + 'no backup uuid found');
+        return;
+    }
     // restoreBackup
     const backupFilePath = file.getBackupPath(backupUuid);
     {
@@ -147,9 +156,7 @@ async function uninstallImpl() {
             }
         }
     }
-    disabledRestart();
 }
-exports.uninstallImpl = uninstallImpl;
 function reloadWindow() {
     // reload vscode-window
     vscode.commands.executeCommand('workbench.action.reloadWindow');
@@ -167,6 +174,9 @@ function _catch(e) {
 //   return uninstallImpl().catch(_catch)
 // }
 function activate(context) {
+    context.subscriptions.push(vscode.commands.registerCommand('extension.updateCustomCSS', () => {
+        return uninstallImpl().then(installImpl).catch(_catch);
+    }));
     return installImpl().catch(_catch);
 }
 exports.activate = activate;

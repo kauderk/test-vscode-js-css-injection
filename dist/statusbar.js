@@ -22,12 +22,13 @@
                 e.appendChild(a);
             }
             e1.appendChild(e);
-            let on = localStorage.getItem('vscode-custom-css') === 'true';
-            e.onclick = () => {
-                const id = 'vscode-custom-css';
+            const id = 'vscode-custom-css';
+            const isTrue = () => localStorage.getItem(id) === 'true';
+            function applyCustomCss(on) {
                 const styles = document.getElementById(id) ?? document.createElement('style');
                 styles.id = id;
                 span.style.fontWeight = on ? 'bold' : 'normal';
+                // span.style.backgroundColor = on ? '#ff0000' : 'transparent'
                 styles.innerHTML = on
                     ? `
 				.view-lines {
@@ -42,10 +43,28 @@
 				`
                     : '';
                 document.body.appendChild(styles);
-                on = !on;
-                localStorage.setItem('vscode-custom-css', String(on));
+            }
+            // FIXME: figure out why this runs twice sometimes
+            applyCustomCss(isTrue());
+            // Toggle
+            e.onclick = () => {
+                const on = isTrue();
+                applyCustomCss(on);
+                localStorage.setItem(id, String(!on));
             };
+            // @ts-ignore
+            if (!window.onloadCustomCssJsIndicatorInterval) {
+                // @ts-ignore
+                window.onloadCustomCssJsIndicatorInterval = true;
+                console.log('window vscode-custom-css is active!');
+            }
         }
     }
-    setInterval(patch, 5000);
+    // @ts-ignore
+    if (window.customCssJsIndicatorInterval) {
+        // @ts-ignore
+        clearInterval(window.customCssJsIndicatorInterval);
+    }
+    // @ts-ignore
+    window.customCssJsIndicatorInterval = setInterval(patch, 5000);
 })();

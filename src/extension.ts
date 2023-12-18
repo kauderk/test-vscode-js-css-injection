@@ -29,9 +29,7 @@ function getWorkBenchHtmlData() {
 async function installImpl() {
   const file = getWorkBenchHtmlData()
 
-  const backupUuid = await getBackupUuid(file.path).catch((e) =>
-    console.error(e)
-  )
+  const backupUuid = await getBackupUuid(file.path)
   if (backupUuid) {
     console.log('vscode-custom-css is active!')
     return
@@ -88,6 +86,7 @@ async function installImpl() {
     } catch (e) {
       vscode.window.showInformationMessage(msg.admin)
       disabledRestart()
+      return
     }
 
     // enabledRestart()
@@ -110,20 +109,29 @@ async function getBackupUuid(path: string) {
   try {
     const uid = (await fs.promises.readFile(path, 'utf-8')) //
       .match(/<!-- !! VSCODE-CUSTOM-CSS-SESSION-ID ([0-9a-fA-F-]+) !! -->/)
-    if (!uid) throw new Error('no backup uuid found')
+    if (!uid) return null
     else return uid[1]
   } catch (e) {
     vscode.window.showInformationMessage(msg.somethingWrong + e)
     throw e
   }
 }
-export async function uninstallImpl() {
+export async function uninstall() {
+  return uninstallImpl().then(disabledRestart).catch(_catch)
+}
+async function uninstallImpl() {
   const file = getWorkBenchHtmlData()
 
   // if typescript wont won't freak out about promises then nothing matters :D
   // getBackupUuid
   const backupUuid = await getBackupUuid(file.path)
 
+  if (!backupUuid) {
+    vscode.window.showInformationMessage(
+      msg.somethingWrong + 'no backup uuid found'
+    )
+    return
+  }
   // restoreBackup
   const backupFilePath = file.getBackupPath(backupUuid)
   {
@@ -148,8 +156,6 @@ export async function uninstallImpl() {
       }
     }
   }
-
-  disabledRestart()
 }
 
 function reloadWindow() {
@@ -171,5 +177,11 @@ function _catch(e: unknown) {
 //   return uninstallImpl().catch(_catch)
 // }
 export function activate(context: vscode.ExtensionContext) {
+  context.subscriptions.push(
+    vscode.commands.registerCommand('extension.updateCustomCSS', () => {
+      return uninstallImpl().then(installImpl).catch(_catch)
+    })
+  )
+
   return installImpl().catch(_catch)
 }
